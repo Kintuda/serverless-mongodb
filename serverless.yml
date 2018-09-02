@@ -1,0 +1,25 @@
+service: aws-nodejs # NOTE: update this with your service name
+provider:
+  name: aws
+  runtime: nodejs8.10
+  profile: default
+  region: us-east-1
+  
+
+# you can add packaging information here
+#package:
+include:
+  - node_modules
+exclude:
+  - package-lock.json
+
+functions:
+  hello:
+    handler: handler.exchangeData
+    environment: ${file(./env.yml)}
+    events:
+      - http:
+          path: webhook
+          method: post
+plugins:
+    - serverless-offline
