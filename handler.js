@@ -7,7 +7,7 @@ const pg = require('pg')
 const exchangeData = (event, context, callback) => {
   let uri = process.env.MONGODB_URI
   if (atlas_connection_uri != null) {
-    processEvent(event, context,callback)
+    processEvent(event, context, callback)
   }
   else {
     atlas_connection_uri = uri
@@ -30,22 +30,20 @@ const processEvent = (event, context, callback) => {
   connectToDatabase(atlas_connection_uri)
     .then(db => queryDatabase(db, event))
     .then(result => {
-      if(!result) callback(null, 'Nenhum dado encontrado com o protocolo')
+      if (!result) callback(null, 'Nenhum dado encontrado com o protocolo')
       return result
     })
-    .then((notificacao)=>{
+    .then((notificacao) => {
       let { notifications } = notificacao
-      notifications.map(notification=>{
+      notifications.map(notification => {
         let objeto = {}
         objeto['sent'] = false
-        if(notification.send){
+        if (notification.send) {
           objeto['sent'] = true
         }
         arrayRetorno.push(objeto)
+        callback(null,arrayRetorno)
       })
-    })
-    .then((objeto)=>{
-      
     })
     .catch(err => {
       console.log(`Erro ao conectar no realizar query. Erro:`);
@@ -53,14 +51,10 @@ const processEvent = (event, context, callback) => {
     })
 }
 
-function queryDatabase(db, event) {
-  let jsonContents = JSON.parse(JSON.stringify(event))
-  let protocolo
-  if (event.body !== null && event.body !== undefined && event.body.protocolo !==undefined) {
-    protocolo = event.body.protocol
-  }
-
-  return db.collection(process.env.MONGODB_COLLECTION).findOne({protocol: protocolo})
+const queryDatabase = (db, event) => {
+  let { protocol } = JSON.parse(event.body)
+  console.log(protocol);
+  return db.collection(process.env.MONGODB_COLLECTION).findOne({ protocol })
     .then(result => { return result })
     .catch(err => { return err })
 }

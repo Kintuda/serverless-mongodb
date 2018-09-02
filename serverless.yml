@@ -14,7 +14,7 @@ exclude:
   - package-lock.json
 
 functions:
-  hello:
+  query:
     handler: handler.exchangeData
     environment: ${file(./env.yml)}
     events:
